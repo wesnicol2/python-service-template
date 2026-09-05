@@ -33,6 +33,38 @@ The asymmetry is deliberate. Getting a stale README fixed is cheap and the
 downside of not fixing it is real; changing a contract is cheap to do and
 expensive to notice.
 
+## Local fix and verification contract
+
+Agents are expected to have a local shell/runtime, but they do not need access
+to a deployed Test environment to produce lint-clean, formatted, unit-tested
+code.
+
+After editing Python, run:
+
+```bash
+bash scripts/fix
+```
+
+Do not manually predict Ruff's formatting. The repository pins Ruff and the
+script applies its safe lint fixes followed by its formatter. If an issue cannot
+be auto-fixed, `bash scripts/verify` will report it for an explicit code change.
+
+Before every push, run:
+
+```bash
+bash scripts/verify
+```
+
+This is a hard pre-push gate. It runs Ruff linting, Ruff's format check, syntax
+compilation of tracked Python files, and pytest. CI invokes this exact same
+script. CI is confirmation of local verification, not the first environment in
+which an agent should discover formatting, lint, syntax, or unit-test failures.
+
+A deployed Test environment has a different job: integration verification after
+a `dev/*` branch is promoted to `feature/*`. Use Test for behavior that depends
+on containers, networking, credentials, upstream services, persistent data, or
+other runtime conditions that local unit tests do not reproduce.
+
 ---
 
 ## The core idea
