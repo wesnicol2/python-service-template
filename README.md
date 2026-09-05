@@ -52,13 +52,29 @@ python -m app.api --host 0.0.0.0 --port 8000
 
 ## Test it
 
+Install the development dependencies once:
+
 ```bash
 pip install -e ".[dev]"
-ruff check && ruff format --check
-python -m pytest tests/
 ```
 
-CI runs exactly these on every push, and a red check blocks the merge.
+After editing Python, let the repository normalize it rather than hand-formatting
+for Ruff:
+
+```bash
+bash scripts/fix
+```
+
+Before every push, run the same verification gate CI runs:
+
+```bash
+bash scripts/verify
+```
+
+That gate checks Ruff linting and formatting, Python syntax, and the unit tests.
+A deployed Test environment is still required for integration verification after
+`dev/*` is promoted to `feature/*`; it is not required to get linting and unit
+tests green.
 
 ## Endpoints
 
@@ -70,6 +86,8 @@ CI runs exactly these on every push, and a red check blocks the merge.
 - `app/` — the application. `api.py` is the entrypoint (the `Dockerfile`'s
   `CMD`).
 - `tests/` — unit tests.
+- `scripts/` — repo-owned local fix and verification commands used by agents
+  and CI.
 - `docs/` — long-form docs and the new-repo checklist.
 - `data/` — runtime state, git-ignored; mount this.
 
